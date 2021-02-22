@@ -11,7 +11,7 @@ public class CarController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        theRB.transform.parent = null;  
     }
 
     // Update is called once per frame
