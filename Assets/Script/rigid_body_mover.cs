@@ -13,11 +13,11 @@ public class rigid_body_mover : MonoBehaviour
     private bool onGround, lost, standStill, outOfTime = false;
     private Vector3 startPosition;
     Quaternion startRotation;
-    public TextMesh loseText, winText;
-    float currentTime = 0f, startingTime = 10;
-    private bool startTimer = false;
+    public TextMesh player_text, score;
+    float currentTime = 0f, startingTime = 20;
+    private bool startTimer = false, waited = false;
     float x, y, z;
-
+    private int score_value = 0;
     void Start()
     {
         
@@ -27,8 +27,8 @@ public class rigid_body_mover : MonoBehaviour
         startPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
         //startRotation = new Vector3(gameObject.transform.rotation.x, gameObject.transform.rotation.y, gameObject.transform.rotation.z);
         startRotation = transform.rotation;
-        loseText.text = "";
-        winText.text = "";
+        player_text.text = "";
+        score.text = "Score: " + score_value.ToString();
         currentTime = startingTime;
 
 
@@ -37,19 +37,39 @@ public class rigid_body_mover : MonoBehaviour
     }
 
 
+    void reSpawnCountdown(float length)
+    {
+        if (lost)
+        {
+            length -= Time.deltaTime;
+
+            if (length <= 0.0f)
+            {
+                length = 0.0f;
+                waited = true;
+            }
+        }
+        else
+        {
+            waited = false;
+        }
+ 
+    }
+
     void backToSpawnCrash()
     {
         lost = true;
-        loseText.text = "Looks like ya crashed - Give it another go";
+        player_text.text = "Looks like ya crashed - Give it another go";
         startTimer = false;
-        countdown.text = startingTime.ToString();
+        currentTime = startingTime;
     }
 
     void backToSpawnTime()
     {
-        loseText.text = "Looks like ya ran out of time - Give it another go";
+        lost = true;
+        player_text.text = "Looks like ya ran out of time - Give it another go";
         startTimer = false;
-        countdown.text = startingTime.ToString();
+        currentTime = startingTime;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -57,10 +77,11 @@ public class rigid_body_mover : MonoBehaviour
         if (collision.gameObject.name.Equals("road"))
         {
             onGround = true;
-            countdown.text = startingTime.ToString();
+            
         }
         if (collision.gameObject.name.Contains("Barrel")) //if a barrel is hit
         {
+            
             backToSpawnCrash();
             //thats rough buddy
         }
@@ -79,21 +100,35 @@ public class rigid_body_mover : MonoBehaviour
         if (collision.gameObject.name.Equals("Start_box"))
         {
             startTimer = true;
+            player_text.text = "";
 
         }
 
         if (collision.gameObject.name.Equals("Finish_box"))
         {
             startTimer = false;
-            winText.text = "Well Done champ, onto the next stage";
+            player_text.text = "Well Done champ, onto the next stage";
+            score_value++; ;
         }
+
+        if (collision.gameObject.name.Equals("raceInformant"))
+        {
+            player_text.text = "OK hotshot, lets see how you handle a race";
+            player_text.alignment = TextAlignment.Center;
+        }
+
+        if (collision.gameObject.name.Equals("raceInfo"))
+        {
+            player_text.text = " Pull up next to the yellow car and press ENTER to start race";
+        }
+
     }
 
     void clock()
     {
         if (startTimer)
         {
-            currentTime -= 1 * Time.deltaTime;
+            currentTime -= 1 *Time.deltaTime;
             countdown.text = currentTime.ToString("0");
 
             if (currentTime <= 0)
@@ -104,9 +139,15 @@ public class rigid_body_mover : MonoBehaviour
         }
 }
 
+
+    void updateScore()
+    {
+        score.text = "Score: " + score_value;
+    }
     void Update()
     {
         clock();
+        updateScore();
         turnInput = Input.GetAxis("Horizontal");
         if (onGround)
         {
@@ -148,6 +189,7 @@ public class rigid_body_mover : MonoBehaviour
 
         if (standStill && lost)
         {
+            score_value--;
             gameObject.transform.rotation = startRotation;
             gameObject.transform.position = startPosition;
             lost = false;
