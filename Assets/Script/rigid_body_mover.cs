@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class rigid_body_mover : MonoBehaviour
 {
@@ -10,10 +11,11 @@ public class rigid_body_mover : MonoBehaviour
 
     [SerializeField] Text countdown;
     private float speedInput;//, turnInput;
-    private bool onGround, lost;//, standStill;
+    private bool onGround, lost;
     private Vector3 startPosition;
     Quaternion originalRotation;
-    public TextMesh player_text, score;
+    
+    public TextMesh player_text, score, position;
     float currentTime = 0f, startingTime = 20;
     private bool startTimer = false;
 
@@ -101,7 +103,22 @@ public class rigid_body_mover : MonoBehaviour
 
         if (name.Equals("raceInfo"))
         {
-            player_text.text = " Pull up next to the yellow car and press 'G' to start race countdown";
+            playerMessage(" Pull up next to the yellow car and press 'G' to start race countdown");
+        }
+
+        if (name.Equals("Game_over_box"))
+        {
+         
+            int position_value = Int32.Parse(position.text);
+            if (score_value >= 15 && position_value == 1) //got enough points and came first
+            {
+                playerMessage("YOU WIN: You Scored " + score_value.ToString() + " points! congratulations");
+            }
+            else
+            {
+                playerMessage(" YOU LOST: You Scored " + score_value.ToString());
+            }
+            
         }
 
     }
@@ -125,7 +142,7 @@ public class rigid_body_mover : MonoBehaviour
 
     void updateScore()
     {
-        score.text = score_value.ToString("0");
+        score.text = score_value.ToString("0");    
     }
 
 
@@ -201,9 +218,7 @@ public class rigid_body_mover : MonoBehaviour
         {
             lostToTime(); //lost to time condition
         }
-
         ResetPlayer(checkIfStationary(), lost); //check it not moving before sending back
-  
         updateScore();
     }
 

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//adapted from https://youtu.be/yvGSnh-Lc7o
 public class flocking : MonoBehaviour
 {
 
