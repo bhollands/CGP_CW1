@@ -10,9 +10,10 @@ public class flocking : MonoBehaviour
     public GameObject cube;
     public int numOfCubes;
     public GameObject[] allCubes;
-    public Vector3 flyLimits = new Vector3(5, 5, 5);
+    public Vector3 flyLimits = new Vector3(5, 5, 5); //set the flying limits
     // Start is called before the first frame update
 
+    //make slideers to adjust the settings
     [Header("Settings")]
     [Range(0.0f, 5.0f)]
     public float minSpeed;
@@ -25,12 +26,12 @@ public class flocking : MonoBehaviour
 
     void Start()
     {
-        allCubes = new GameObject[numOfCubes];
-        for (int i = 0; i < numOfCubes; i++)
+        allCubes = new GameObject[numOfCubes]; //make an array of all the cubes
+        for (int i = 0; i < numOfCubes; i++) //for all of the cubes
         {
-            Vector3 position = this.transform.position + new Vector3(Random.Range(-flyLimits.x, flyLimits.x), Random.Range(-flyLimits.y, flyLimits.y), Random.Range(-flyLimits.z, flyLimits.z));
-            allCubes[i] = (GameObject)Instantiate(cube, position, Quaternion.identity);
-            allCubes[i].GetComponent <cubeController>().myFlock = this;
+            Vector3 position = this.transform.position + new Vector3(Random.Range(-flyLimits.x, flyLimits.x), Random.Range(-flyLimits.y, flyLimits.y), Random.Range(-flyLimits.z, flyLimits.z)); //get random position in the limits
+            allCubes[i] = (GameObject)Instantiate(cube, position, Quaternion.identity); //instanciate them
+            allCubes[i].GetComponent <cubeController>().myFlock = this; //get the cube controller
         }
     }
 

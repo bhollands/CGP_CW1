@@ -79,7 +79,7 @@ public class rigid_body_mover : MonoBehaviour
     void OnTriggerEnter(Collider collision)
     {
         string name = collision.gameObject.name;
-        if (name.Equals("Start_box"))
+        if (name.Equals("Start_box")) //at start of level
         {
             startTimer = true;
             start_message.text = "";
@@ -88,7 +88,7 @@ public class rigid_body_mover : MonoBehaviour
 
         }
 
-        if (name.Equals("Finish_box"))
+        if (name.Equals("Finish_box")) //if finished first stage
         {
             startTimer = false;
             playerMessage("Well Done champ, onto the next stage");
@@ -96,12 +96,9 @@ public class rigid_body_mover : MonoBehaviour
             score_value = score_value + 5;
         }
 
-        if (name.Equals("raceInformant"))
+        if (name.Equals("raceInformant")) //race coming up
         {
-            print("Im Here");
             playerMessage("OK hotshot, lets see how you handle a race");
-            //player_text.text = "OK hotshot, lets see how you handle a race";
-            //player_text.alignment = TextAlignment.Center;
         }
 
         if (name.Equals("raceInfo"))
@@ -120,13 +117,11 @@ public class rigid_body_mover : MonoBehaviour
             else
             {
                 playerMessage(" YOU LOST: You Scored " + score_value.ToString() + " points, better luck next time");
-            }
-            
+            }  
         }
-
     }
 
-    bool timeOut()
+    bool timeOut() //determins if the player timeouts
     {
         if (startTimer)
         {
@@ -158,13 +153,13 @@ public class rigid_body_mover : MonoBehaviour
             speedInput = 0f;
             if (forwardBack > 0) //pressing up/down or w/s
             {
-                speedInput = forwardBack * forwardAccel * 1000f;
+                speedInput = forwardBack * forwardAccel * 1000f; //accelerate forward
             }
             else if (forwardBack < 0) //pressing up/down or w/s
             {
-                speedInput = forwardBack * reverseAccel * 1000f;
+                speedInput = forwardBack * reverseAccel * 1000f; //accelerate backwards
             }
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space)) //jump
             {
                 playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); //gravity applied as an impulse for jumping
             }
@@ -175,7 +170,7 @@ public class rigid_body_mover : MonoBehaviour
             turnInAir(turnInput);
         }
     }
-    void turnInAir(float turnInput)
+    void turnInAir(float turnInput) //for turning in air and gravity
     {
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0f, turnInput * turnstrength * Time.deltaTime, 0f));
         playerRB.AddForce(Vector3.down * gravityForce, ForceMode.Impulse);
