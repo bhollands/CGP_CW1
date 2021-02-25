@@ -15,7 +15,7 @@ public class opponentControl : MonoBehaviour
     private Vector3 endPosition, originalPosition;
     float currentTime = 0f, startingTime = 3;//, distBetweenCars;
     int score_value;
-    private bool close, countDownFinished, AgentAhead = false, playerWin = false, startTimer = false, showTimer = true, raceOver = false, opReachedEnd = false;
+    private bool close, countDownFinished, AgentAhead = false, playerWin = false, startTimer = false, showTimer = true, raceOver = false;//, opAtEnd = false;
     void Start()
     {
         endPosition = new Vector3(end_point.transform.position.x, end_point.transform.position.y, end_point.transform.position.z); // position to go to
@@ -32,20 +32,29 @@ public class opponentControl : MonoBehaviour
         {
             if (AgentAhead && !playerWin)//if ahead when collidering with end box
             {
-                player_message.text = "You lost";
+                player_message.text = "Ayy too bad kid, if you want a rematch come and see me";
+              
                 playerWin = false;
-                raceOver = true; 
-                opReachedEnd = true;
-                //agent.SetDestination(originalPosition);
+                raceOver = true;
+                //opAtEnd = true;
+                showTimer = false;
+                countdown.text = "";
             }
-/*            else
-            {
-                agent.SetDestination(originalPosition);
-            }*/
         }
         if (name.Equals("raceStartbox"))
         {
-            opReachedEnd = false;
+            //opAtEnd = false;
+            //gameObject.transform.rotation = startRotation;
+
+        }
+    }
+
+    void OnTriggerExit(Collider collision)
+    {
+        string name = collision.gameObject.name;
+        if (name.Equals("raceWall"))
+        {
+            
             gameObject.transform.rotation = startRotation;
 
         }
@@ -54,31 +63,23 @@ public class opponentControl : MonoBehaviour
 
     void clock()
     {
-        if (startTimer)
+        currentTime -= 1 * Time.deltaTime;
+        if (showTimer)
         {
-            currentTime -= 1 * Time.deltaTime;
+            countdown.text = currentTime.ToString("0");
+        }
+            
+        if (currentTime <= 1)
+        {
+            currentTime = 1;
+            countDownFinished = true;
+            startTimer = false;
             if (showTimer)
             {
-                countdown.text = currentTime.ToString("0");
-            }
-            
-            if (currentTime <= 1)
-            {
-                currentTime = 1;
-                countDownFinished = true;
-                startTimer = false;
-                if (showTimer)
-                {
-                    countdown.text = "GO";
-                }
+                countdown.text = "GO!!!!!";
             }
         }
     }
-
-    //4 states in switch case
-    //1. waiting to race()
-    //2. racing()
-    //3. Returning from race()
 
     void playerMessage(string message)
     {
@@ -89,24 +90,11 @@ public class opponentControl : MonoBehaviour
     {
         player_message.text = "";
     }
-
-    void positionCheck(float oppDistToEnd, float playerDistToEnd)
-    {
-        if (oppDistToEnd < playerDistToEnd)
-        {
-            AgentAhead = true;
-        }
-        else
-        {
-            AgentAhead = false;
-        }
-    }
-
     void playerWinCase(float distToEnd)
     {
-        if (distToEnd < 6 && !AgentAhead && !playerWin)
+        if (distToEnd < 6 && !AgentAhead && !raceOver)
         {
-            player_message.text = "congrats kid, let me know if you want to race again";
+            player_message.text = "congrats kid, let me know if you want to race again I'll be waiting";
             
             countdown.text = "";
             playerWin = true;
@@ -116,7 +104,7 @@ public class opponentControl : MonoBehaviour
     void start_race()
     {
         //startTimer = true;
-        if (countDownFinished && !raceOver)
+        if (countDownFinished && !raceOver) //countdown is finished and race is over
         {
             agent.SetDestination(endPosition);
             (raceWall.GetComponent(typeof(Collider)) as Collider).isTrigger = true; //be able to go through all when rcae start
@@ -130,12 +118,14 @@ public class opponentControl : MonoBehaviour
         float distToStart = Vector3.Distance(player.transform.position, race_start_box.transform.position);
         if (Input.GetKey(KeyCode.G) && distToStart < 3)
         {
+            (raceWall.GetComponent(typeof(Collider)) as Collider).isTrigger = false; //be able to go through all when rcae start
             clearPlayerMessage();
             countDownFinished = false; //reset if player wants to go again
-            raceOver = false;
-            currentTime = 3f;
-            startTimer = true;
-            playerWin = false;
+            raceOver = false; //the race isnt over
+            currentTime = 5f; //length of ravce countdown
+            startTimer = true; //start the timer
+            showTimer = true; //show the timer
+            playerWin = false; //the player has not won
         }
         start_race();
     }
@@ -156,28 +146,38 @@ public class opponentControl : MonoBehaviour
         float oppDistToEnd = Vector3.Distance(gameObject.transform.position, race_end_box.transform.position);
         return oppDistToEnd;
     }
-    void Update()
+
+    void determinPosition()
     {
-        clock();
-        startRaceCountdown();  
-        //float oppDistToEnd = Vector3.Distance(gameObject.transform.position, race_end_box.transform.position);
-        //float playerDistToEnd = Vector3.Distance(player.transform.position, race_end_box.transform.position);
-
-        positionCheck(getOpponentDistanceToEnd(), getPlayerDistanceToEnd());
-
-        playerWinCase(getPlayerDistanceToEnd());
         if (countDownFinished && !raceOver)
         {
             if (getPlayerDistanceToEnd() < getOpponentDistanceToEnd()) //and the race isnt over
             {
+                AgentAhead = false;
                 position.text = "1";
             }
             else
             {
+                AgentAhead = true;
                 position.text = "2";
             }
-            
+
         }
+    }
+    void Update()
+    {
+        if (startTimer)
+        {
+            clock();
+        }
+        
+        startRaceCountdown();
+
+        determinPosition();
+        //positionCheck(getOpponentDistanceToEnd(), getPlayerDistanceToEnd());
+
+        playerWinCase(getPlayerDistanceToEnd());
+
 
         if (raceOver)
         {
@@ -185,6 +185,10 @@ public class opponentControl : MonoBehaviour
 
         }
 
+        if (Input.GetKey(KeyCode.C))
+        {
+            clearPlayerMessage();
+        }
         //move car to the position
     }
 }

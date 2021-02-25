@@ -14,8 +14,8 @@ public class rigid_body_mover : MonoBehaviour
     private bool onGround, lost;
     private Vector3 startPosition;
     Quaternion originalRotation;
-    
-    public TextMesh player_text, score, position;
+
+    public TextMesh player_text, score, position, start_message;
     float currentTime = 0f, startingTime = 20;
     private bool startTimer = false;
 
@@ -82,6 +82,7 @@ public class rigid_body_mover : MonoBehaviour
         if (name.Equals("Start_box"))
         {
             startTimer = true;
+            start_message.text = "";
             clearPlayerMessage();
             //player_text.text = "";
 
@@ -95,15 +96,17 @@ public class rigid_body_mover : MonoBehaviour
             score_value = score_value + 5;
         }
 
-        if (Equals("raceInformant"))
+        if (name.Equals("raceInformant"))
         {
-            player_text.text = "OK hotshot, lets see how you handle a race";
-            player_text.alignment = TextAlignment.Center;
+            print("Im Here");
+            playerMessage("OK hotshot, lets see how you handle a race");
+            //player_text.text = "OK hotshot, lets see how you handle a race";
+            //player_text.alignment = TextAlignment.Center;
         }
 
         if (name.Equals("raceInfo"))
         {
-            playerMessage(" Pull up next to the yellow car and press 'G' to start race countdown");
+            playerMessage(" Pull up next to the car and press 'G' to start race countdown");
         }
 
         if (name.Equals("Game_over_box"))
@@ -116,7 +119,7 @@ public class rigid_body_mover : MonoBehaviour
             }
             else
             {
-                playerMessage(" YOU LOST: You Scored " + score_value.ToString());
+                playerMessage(" YOU LOST: You Scored " + score_value.ToString() + " points, better luck next time");
             }
             
         }
