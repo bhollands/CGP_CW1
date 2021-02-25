@@ -16,10 +16,7 @@ public class CountDownTimer : MonoBehaviour
     void Start()
     {
         winText.text = "";
-        
-        
-
-       
+ 
     }
 
     void OnTriggerEnter(Collider collision)
